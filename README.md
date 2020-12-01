@@ -1,6 +1,8 @@
-# XorFilter
+# XORFilter
 
-**TODO: Add description**
+probablistic set membership
+
+See the [whitepaper](https://arxiv.org/abs/1912.08258)
 
 ## Installation
 
