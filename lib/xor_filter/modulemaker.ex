@@ -1,6 +1,6 @@
 defmodule XorFilter.ModuleMaker do
   @moduledoc false
-  defmacro gen_modules(main, app, sup, buckets) do
+  defmacro gen_modules(main, app, sup, work, buckets) do
     quote bind_quoted: binding() do
       defmodule app do
         @moduledoc false
@@ -15,6 +15,9 @@ defmodule XorFilter.ModuleMaker do
         end
       end
 
+      defmodule work do
+      end
+
       defmodule main do
         @moduledoc false
         require Blake2
@@ -24,11 +27,21 @@ defmodule XorFilter.ModuleMaker do
           unquote(app).start([], [])
         end
 
+        mfa = main |> Module.split() |> Enum.map(&to_string/1)
+
+        # Not existing atom, but we control the input
+        # We also don't mind appending here for readability.
+        defp bucket_atom(n),
+          do:
+            (unquote(mfa) ++ [n])
+            |> Enum.join("_")
+            |> String.to_atom()
+
         case {buckets, rem(256, buckets)} do
           # Always goes in the only bucket
           # Avoid the hashing overhead
           {1, 0} ->
-            def bucket_for(_), do: 0
+            def bucket_for(_), do: bucket_atom(0)
 
           # Figure out which bucket otherwise
           {_, n} ->
@@ -45,7 +58,7 @@ defmodule XorFilter.ModuleMaker do
                 end
               end
 
-              rem(pick.("A", pick), unquote(buckets))
+              bucket_atom(rem(pick.("A", pick), unquote(buckets)))
             end
         end
       end

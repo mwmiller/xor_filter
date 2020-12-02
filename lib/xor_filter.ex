@@ -14,7 +14,8 @@ defmodule XorFilter do
     main = Module.concat("XorFilter", name)
     app = Module.concat(main, "Application")
     sup = Module.concat(main, "Supervisor")
-    XorFilter.ModuleMaker.gen_modules(main, app, sup, buckets)
+    work = Module.concat(main, "Bucket")
+    XorFilter.ModuleMaker.gen_modules(main, app, sup, work, buckets)
 
     case Code.ensure_compiled(main) do
       {:module, module} -> module

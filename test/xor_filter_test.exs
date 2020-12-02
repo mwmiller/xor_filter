@@ -43,8 +43,28 @@ defmodule XorFilterTest do
       "a netmask"
     ]
 
-    assert [0, 0, 0, 0, 0] = BucketList.generate("IP1", 1, test_strings)
-    assert [2, 0, 5, 4, 1] = BucketList.generate("IP7", 7, test_strings)
-    assert [9, 14, 10, 7, 8] = BucketList.generate("IP16", 16, test_strings)
+    assert [
+             :XorFilter_IP1_0,
+             :XorFilter_IP1_0,
+             :XorFilter_IP1_0,
+             :XorFilter_IP1_0,
+             :XorFilter_IP1_0
+           ] = BucketList.generate("IP1", 1, test_strings)
+
+    assert [
+             :XorFilter_IP7_2,
+             :XorFilter_IP7_0,
+             :XorFilter_IP7_5,
+             :XorFilter_IP7_4,
+             :XorFilter_IP7_1
+           ] = BucketList.generate("IP7", 7, test_strings)
+
+    assert [
+             :XorFilter_IP16_9,
+             :XorFilter_IP16_14,
+             :XorFilter_IP16_10,
+             :XorFilter_IP16_7,
+             :XorFilter_IP16_8
+           ] = BucketList.generate("IP16", 16, test_strings)
   end
 end
