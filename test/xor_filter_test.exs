@@ -15,20 +15,24 @@ defmodule XorFilterTest do
   end
 
   test "failure modes" do
-    assert_raise RuntimeError, "must supply a positive integer for buckets", fn ->
+    assert_raise RuntimeError, "must supply an integer on [1,255] for buckets", fn ->
       XorFilter.prepare("Broken", 0)
     end
 
-    assert_raise RuntimeError, "must supply a positive integer for buckets", fn ->
+    assert_raise RuntimeError, "must supply an integer on [1,255] for buckets", fn ->
       XorFilter.prepare("Broken", -1)
     end
 
-    assert_raise RuntimeError, "must supply a positive integer for buckets", fn ->
+    assert_raise RuntimeError, "must supply an integer on [1,255] for buckets", fn ->
       XorFilter.prepare("Broken", 1.0)
     end
 
-    assert_raise RuntimeError, "must supply a positive integer for buckets", fn ->
+    assert_raise RuntimeError, "must supply an integer on [1,255] for buckets", fn ->
       XorFilter.prepare("Broken", "bucket_count")
+    end
+
+    assert_raise RuntimeError, "must supply an integer on [1,255] for buckets", fn ->
+      XorFilter.prepare("Broken", 257)
     end
   end
 

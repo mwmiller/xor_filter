@@ -10,7 +10,7 @@ defmodule XorFilter do
   @spec prepare(String.t(), pos_integer) :: term
   def prepare(name, buckets \\ 1)
 
-  def prepare(name, buckets) when is_integer(buckets) and buckets >= 1 do
+  def prepare(name, buckets) when is_integer(buckets) and buckets >= 1 and buckets <= 256 do
     main = Module.concat("XorFilter", name)
     app = Module.concat(main, "Application")
     sup = Module.concat(main, "Supervisor")
@@ -23,7 +23,7 @@ defmodule XorFilter do
     end
   end
 
-  def prepare(_, _), do: raise(RuntimeError, "must supply a positive integer for buckets")
+  def prepare(_, _), do: raise(RuntimeError, "must supply an integer on [1,255] for buckets")
 
   @doc """
   Prepare and start an XOR filter application
