@@ -24,7 +24,9 @@ defmodule XorFilter.MixProject do
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
-    []
+    [
+      {:blake2, "~> 1.0"}
+    ]
   end
 
   defp description do
