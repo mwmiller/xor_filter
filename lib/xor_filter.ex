@@ -12,10 +12,9 @@ defmodule XorFilter do
 
   def prepare(name, buckets) when is_integer(buckets) and buckets >= 1 and buckets <= 256 do
     main = Module.concat("XorFilter", name)
-    app = Module.concat(main, "Application")
     sup = Module.concat(main, "Supervisor")
     work = Module.concat(main, "Bucket")
-    XorFilter.ModuleMaker.gen_modules(main, app, sup, work, buckets)
+    XorFilter.ModuleMaker.gen_modules(main, sup, work, buckets)
 
     case Code.ensure_compiled(main) do
       {:module, module} -> module
@@ -31,7 +30,7 @@ defmodule XorFilter do
   @spec start(String.t(), pos_integer) :: {term, pid}
   def start(name, buckets \\ 1) do
     mod = prepare(name, buckets)
-    {:ok, pid} = mod.start()
+    {:ok, pid} = mod.start([], [])
     {mod, pid}
   end
 end
