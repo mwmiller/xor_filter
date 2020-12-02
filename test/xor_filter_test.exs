@@ -2,16 +2,34 @@ defmodule XorFilterTest do
   use ExUnit.Case
   doctest XorFilter
 
-  test "Create test filter" do
+  test "create test filter" do
     expected_mod = XorFilter.Prepare
     assert expected_mod == XorFilter.prepare("Prepare", 1)
     assert {:ok, pid} = expected_mod.start()
     assert :erlang.is_pid(pid)
   end
 
-  test "Create and run a test filter" do
+  test "create and run a test filter" do
     assert {XorFilter.Start, pid} = XorFilter.start("Start", 10)
     assert :erlang.is_pid(pid)
+  end
+
+  test "failure modes" do
+    assert_raise RuntimeError, "must supply a positive integer for buckets", fn ->
+      XorFilter.prepare("Broken", 0)
+    end
+
+    assert_raise RuntimeError, "must supply a positive integer for buckets", fn ->
+      XorFilter.prepare("Broken", -1)
+    end
+
+    assert_raise RuntimeError, "must supply a positive integer for buckets", fn ->
+      XorFilter.prepare("Broken", 1.0)
+    end
+
+    assert_raise RuntimeError, "must supply a positive integer for buckets", fn ->
+      XorFilter.prepare("Broken", "bucket_count")
+    end
   end
 
   test "bucket_for" do

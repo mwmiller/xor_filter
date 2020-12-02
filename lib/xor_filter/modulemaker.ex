@@ -1,6 +1,6 @@
 defmodule XorFilter.ModuleMaker do
   @moduledoc false
-  defmacro gen_modules(main, app, sup, buckets) when buckets >= 1 do
+  defmacro gen_modules(main, app, sup, buckets) do
     quote bind_quoted: binding() do
       defmodule app do
         @moduledoc false
