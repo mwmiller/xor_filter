@@ -1,6 +1,6 @@
 defmodule XorFilter.ModuleMaker do
   @moduledoc false
-  defmacro gen_modules(main, sup, work, buckets) do
+  defmacro gen_modules(main, sup, work, buckets, key_count) do
     quote bind_quoted: binding() do
       defmodule main do
         @moduledoc false

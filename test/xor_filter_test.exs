@@ -4,36 +4,59 @@ defmodule XorFilterTest do
 
   test "create test filter" do
     expected_mod = XorFilter.Prepare
-    assert expected_mod == XorFilter.prepare("Prepare", 1)
+    assert expected_mod == XorFilter.prepare(name: "Prepare")
     assert {:ok, pid} = expected_mod.start([], [])
     assert :erlang.is_pid(pid)
   end
 
   test "create and run a test filter" do
-    assert {XorFilter.Start, pid} = XorFilter.start("Start", 10)
+    assert {XorFilter.Start, pid} = XorFilter.start(name: "Start", buckets: 10)
+
     assert :erlang.is_pid(pid)
   end
 
   test "failure modes" do
-    assert_raise RuntimeError, "must supply an integer on [1,255] for buckets", fn ->
-      XorFilter.prepare("Broken", 0)
-    end
+    assert_raise RuntimeError,
+                 "must supply an integer on [1,256] for buckets",
+                 fn ->
+                   XorFilter.prepare(name: "Broken", buckets: 0)
+                 end
 
-    assert_raise RuntimeError, "must supply an integer on [1,255] for buckets", fn ->
-      XorFilter.prepare("Broken", -1)
-    end
+    assert_raise RuntimeError,
+                 "must supply an integer on [1,256] for buckets",
+                 fn ->
+                   XorFilter.prepare(name: "Broken", buckets: -1)
+                 end
 
-    assert_raise RuntimeError, "must supply an integer on [1,255] for buckets", fn ->
-      XorFilter.prepare("Broken", 1.0)
-    end
+    assert_raise RuntimeError,
+                 "must supply an integer on [1,256] for buckets",
+                 fn ->
+                   XorFilter.prepare(name: "Broken", buckets: 1.0)
+                 end
 
-    assert_raise RuntimeError, "must supply an integer on [1,255] for buckets", fn ->
-      XorFilter.prepare("Broken", "bucket_count")
-    end
+    assert_raise RuntimeError,
+                 "must supply an integer on [1,256] for buckets",
+                 fn ->
+                   XorFilter.prepare(name: "Broken", buckets: "bucket_count")
+                 end
 
-    assert_raise RuntimeError, "must supply an integer on [1,255] for buckets", fn ->
-      XorFilter.prepare("Broken", 257)
-    end
+    assert_raise RuntimeError,
+                 "must supply an integer on [1,256] for buckets",
+                 fn ->
+                   XorFilter.prepare(name: "Broken", buckets: 257)
+                 end
+
+    assert_raise RuntimeError,
+                 "must supply a positive integer for key_count",
+                 fn ->
+                   XorFilter.prepare(name: "Broken", buckets: 5, key_count: 0)
+                 end
+
+    assert_raise RuntimeError,
+                 "must supply a positive integer for key_count",
+                 fn ->
+                   XorFilter.prepare(name: "Broken", buckets: 5, key_count: 3.1415)
+                 end
   end
 
   test "bucket_for" do
@@ -80,7 +103,7 @@ defmodule XorFilterTest do
 
     # These cross buckets.  But we don't want to pretest
     # so that we don't redefine on use here.
-    assert {XorFilter.IP7, _pid} = XorFilter.start("IP7", 7)
+    assert {XorFilter.IP7, _pid} = XorFilter.start(name: "IP7", buckets: 7)
     refute mod.maybe_seen?("127.0.0.1")
     assert :ok = mod.seen("127.0.0.1")
     assert mod.maybe_seen?("127.0.0.1")

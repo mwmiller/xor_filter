@@ -7,14 +7,13 @@ defmodule XorFilter do
   @doc """
   Prepare an XOR filter application
   """
-  @spec prepare(String.t(), pos_integer) :: term
-  def prepare(name, buckets \\ 1)
-
-  def prepare(name, buckets) when is_integer(buckets) and buckets >= 1 and buckets <= 256 do
+  @spec prepare(Keyword.t()) :: term
+  def prepare(args \\ []) do
+    {name, key_count, buckets} = parse_args!(args)
     main = Module.concat("XorFilter", name)
     sup = Module.concat(main, "Supervisor")
     work = Module.concat(main, "Bucket")
-    XorFilter.ModuleMaker.gen_modules(main, sup, work, buckets)
+    XorFilter.ModuleMaker.gen_modules(main, sup, work, buckets, key_count)
 
     case Code.ensure_compiled(main) do
       {:module, module} -> module
@@ -22,14 +21,26 @@ defmodule XorFilter do
     end
   end
 
-  def prepare(_, _), do: raise(RuntimeError, "must supply an integer on [1,255] for buckets")
+  defp parse_args!(args) do
+    buckets = Keyword.get(args, :buckets, 1)
+
+    if not is_integer(buckets) or buckets < 1 or buckets > 256,
+      do: raise(RuntimeError, "must supply an integer on [1,256] for buckets")
+
+    key_count = Keyword.get(args, :key_count, :math.pow(2, 32) |> trunc)
+
+    if not is_integer(key_count) or key_count < 1,
+      do: raise(RuntimeError, "must supply a positive integer for key_count")
+
+    {Keyword.get(args, :name, Enum.join([buckets, key_count], "_")), key_count, buckets}
+  end
 
   @doc """
   Prepare and start an XOR filter application
   """
-  @spec start(String.t(), pos_integer) :: {term, pid}
-  def start(name, buckets \\ 1) do
-    mod = prepare(name, buckets)
+  @spec start(Keyword.t()) :: {term, pid}
+  def start(args \\ []) do
+    mod = prepare(args)
     {:ok, pid} = mod.start([], [])
     {mod, pid}
   end

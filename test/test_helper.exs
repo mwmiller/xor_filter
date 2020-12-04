@@ -2,7 +2,7 @@ ExUnit.start()
 
 defmodule BucketList do
   def generate(name, buckets, strings) do
-    {mod, _pid} = XorFilter.start(name, buckets)
+    {mod, _pid} = XorFilter.start(name: name, buckets: buckets)
     convert(strings, mod, [])
   end
 
